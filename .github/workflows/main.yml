@@ -1,0 +1,35 @@
+#https://github.com/my-test-org-devops/MavenBuild-Docker-GitHubActions
+name:
+on:
+ workflow_dispatch:
+ push:
+  branches:
+    - master
+jobs: 
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone the repo 
+      uses: actions/checkout@v6
+    - name: Install java on runner
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: build java code
+      run: mvn clean package
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: . # location where dockerfile is/dockerfile is in current directory
+        push: true
+        tags: anoopraturi150897/myjavaapp:latest   
+  # docker build -t <imagename> .
+  # docker push <imagename> 
